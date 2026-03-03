@@ -2,7 +2,16 @@ import ReactPaginate from "react-paginate";
 
 import css from "./Pagination.module.css";
 
-export default function Pagination({ totalPages, currentPage, onPageChange }) {
+interface PaginationProps {
+  totalPages: number;
+  currentPage: number;
+  onPageChange: (selected: number) => void;
+}
+
+export default function Pagination({ totalPages, currentPage, onPageChange }: PaginationProps) {
+  if (totalPages <= 0) {
+    return null;
+  }
   return (
     <ReactPaginate
       pageCount={totalPages}

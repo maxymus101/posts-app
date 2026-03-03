@@ -9,12 +9,14 @@ export default function App() {
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
-        <SearchBox />
+        <SearchBox query={""} onSearch={() => {}} />
         <Pagination />
         <button className={css.button}>Create post</button>
       </header>
-      <Modal>{/* Передати через children компонент CreatePostForm або EditPostForm */}</Modal>
-      <PostList />
+      <Modal onClose={() => {}}>
+        {/* Передати через children компонент CreatePostForm або EditPostForm */}
+      </Modal>
+      <PostList posts={[]} toggleModal={() => {}} toggleEditPost={() => {}} />
     </div>
   );
 }
