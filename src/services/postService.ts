@@ -24,13 +24,13 @@ export const fetchPosts = async (
     return res.data.posts;
   } catch (error) {
     if (isAxiosError(error)) {
-      console.error("Error fetching note: ", error.message);
+      console.error("Error fetching post: ", error.message);
       if (error.response) {
         console.error("Response data:", error.response.data);
         console.error("Response status:", error.response.status);
       }
     } else {
-      console.error("Unexpected error fetching note:", error);
+      console.error("Unexpected error fetching post:", error);
     }
     throw error;
   }
@@ -42,13 +42,13 @@ export const createPost = async (newPost: CreatePost): Promise<Post> => {
     return res.data;
   } catch (error) {
     if (isAxiosError(error)) {
-      console.error("Error creating note >>>", error.message);
+      console.error("Error creating post >>>", error.message);
       if (error.response) {
         console.error("Respons data >>>", error.response.data);
         console.error("Respons status >>>", error.response.status);
       }
     } else {
-      console.error("Unexpected error creating note:", error);
+      console.error("Unexpected error creating post:", error);
     }
     throw error;
   }
@@ -57,6 +57,19 @@ export const createPost = async (newPost: CreatePost): Promise<Post> => {
 // export const editPost = async (newDataPost) => {};
 
 export const deletePost = async (postId: number): Promise<Post> => {
-  const res = await axios.delete<Post>(`/posts/${postId}`);
-  return res.data;
+  try {
+    const res = await axios.delete<Post>(`/posts/${postId}`);
+    return res.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error("Can't delete post. >>> ", error.message);
+      if (error.response) {
+        console.error("Response data >>> ", error.response.data);
+        console.error("Response status >>> ", error.response?.status);
+      }
+    } else {
+      console.error("Unexpeted error deleting post >>> ", error);
+    }
+    throw error;
+  }
 };
