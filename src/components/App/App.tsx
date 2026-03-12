@@ -4,8 +4,15 @@ import SearchBox from "../SearchBox/SearchBox";
 import Pagination from "../Pagination/Pagination";
 
 import css from "./App.module.css";
+import { useState } from "react";
 
 export default function App() {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isModalopen, setIsModalOpen] = useState(false);
+  const [isCreatePost, setIsCreatePost] = useState(false);
+  const [isEditPost, setIsEditPost] = useState(false);
+  const [editedPost, setEditedPost] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   return (
     <div className={css.app}>
       <header className={css.toolbar}>
