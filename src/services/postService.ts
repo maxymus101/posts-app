@@ -12,6 +12,12 @@ export interface CreatePost {
   content: string;
 }
 
+export interface PatchPost {
+  id: number;
+  title: string;
+  body: string;
+}
+
 export const fetchPosts = async (
   searchText: string = "",
   page: number = 1,
@@ -54,7 +60,23 @@ export const createPost = async (newPost: CreatePost): Promise<Post> => {
   }
 };
 
-// export const editPost = async (newDataPost) => {};
+export const editPost = async (newDataPost: PatchPost): Promise<Post> => {
+  try {
+    const res = await axios.patch<Post>(`/posts/${newDataPost.id}`, newDataPost);
+    return res.data;
+  } catch (error) {
+    if (isAxiosError(error)) {
+      console.error("Can't patch post. >>> ", error.message);
+      if (error.response) {
+        console.error("Response data >>> ", error.response.data);
+        console.error("Response status >>> ", error.response?.status);
+      }
+    } else {
+      console.error("Unexpeted error patching post >>> ", error);
+    }
+    throw error;
+  }
+};
 
 export const deletePost = async (postId: number): Promise<Post> => {
   try {
