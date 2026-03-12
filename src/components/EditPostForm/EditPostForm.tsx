@@ -1,11 +1,35 @@
 import * as Yup from "yup";
-import { ErrorMessage, Field, Form, Formik } from "formik";
+import { ErrorMessage, Field, Form, Formik, FormikHelpers } from "formik";
 
 import css from "./EditPostForm.module.css";
+import { PatchPost } from "../../services/postService";
 
-export default function EditPostForm() {
+interface EditPostFormProps {
+  onClose: () => void;
+  onSubmit: (inputData: PatchPost | null) => void;
+  initialValues: PatchPost;
+}
+
+const EditPostSchema = Yup.object().shape({
+  title: Yup.string()
+    .trim()
+    .min(3, "Title is too short!")
+    .max(50, "Title is too long!")
+    .required("Please enter title."),
+  body: Yup.string().max(500, "Content is too long!").required("Oppss. No content found."),
+});
+export default function EditPostForm({ onClose, onSubmit, initialValues }: EditPostFormProps) {
+  const handleSubmit = (values: PatchPost, actions: FormikHelpers<PatchPost>) => {
+    actions.resetForm();
+    onSubmit(values);
+  };
   return (
-    <Formik initialValues={} onSubmit={} validationSchema={}>
+    <Formik
+      initialValues={initialValues}
+      onSubmit={handleSubmit}
+      validationSchema={EditPostSchema}
+      enableReinitialize
+    >
       <Form className={css.form}>
         <div className={css.formGroup}>
           <label htmlFor="title">Title</label>
@@ -20,10 +44,10 @@ export default function EditPostForm() {
         </div>
 
         <div className={css.actions}>
-          <button type="button" className={css.cancelButton}>
+          <button type="button" onClick={onClose} className={css.cancelButton}>
             Cancel
           </button>
-          <button type="submit" className={css.submitButton} disabled={}>
+          <button type="submit" className={css.submitButton} disabled={false}>
             Edit post
           </button>
         </div>
