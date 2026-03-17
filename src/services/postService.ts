@@ -5,6 +5,7 @@ axios.defaults.baseURL = "https://jsonplaceholder.typicode.com";
 
 export interface GetPostsResponse {
   posts: Post[];
+  totalPages: number;
 }
 
 export interface CreatePost {
