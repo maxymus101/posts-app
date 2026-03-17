@@ -1,21 +1,17 @@
 import { Post } from "../../types/post";
 import css from "./PostList.module.css";
-import { deletePost } from "../../services/postService";
 
 interface PostListProps {
   posts: Post[];
   toggleModal: () => void;
   toggleEditPost: (post: Post) => void;
+  onDelete: (postId: number) => void;
 }
 
-export default function PostList({ posts, toggleEditPost, toggleModal }: PostListProps) {
+export default function PostList({ posts, toggleEditPost, toggleModal, onDelete }: PostListProps) {
   const handleEdit = (post: Post) => {
     toggleModal();
     toggleEditPost(post);
-  };
-
-  const handleDeletePost = (id: number) => {
-    deletePost(id);
   };
 
   return (
@@ -28,12 +24,7 @@ export default function PostList({ posts, toggleEditPost, toggleModal }: PostLis
             <button className={css.edit} onClick={() => handleEdit(post)}>
               Edit
             </button>
-            <button
-              className={css.delete}
-              onClick={() => {
-                handleDeletePost(post.id);
-              }}
-            >
+            <button className={css.delete} onClick={() => onDelete(post.id)}>
               Delete
             </button>
           </div>
