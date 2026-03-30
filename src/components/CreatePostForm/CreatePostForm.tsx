@@ -7,6 +7,7 @@ import { CreatePost } from "../../services/postService";
 interface PostFormProps {
   onSubmit: (inputData: CreatePost | null) => void;
   onClose: () => void;
+  isSubmitting?: boolean;
 }
 
 const initialValues: CreatePost = {
@@ -19,7 +20,7 @@ const CreatePostSchema = Yup.object().shape({
   content: Yup.string().required("Oppss. No content found"),
 });
 
-export default function PostForm({ onClose, onSubmit }: PostFormProps) {
+export default function PostForm({ onClose, onSubmit, isSubmitting = false }: PostFormProps) {
   const handleSubmit = (values: CreatePost, actions: FormikHelpers<CreatePost>) => {
     actions.resetForm();
     onSubmit(values);
@@ -39,16 +40,16 @@ export default function PostForm({ onClose, onSubmit }: PostFormProps) {
         </div>
 
         <div className={css.formGroup}>
-          <label htmlFor="body">Content</label>
-          <Field id="body" as="textarea" name="body" rows="8" className={css.textarea} />
-          <ErrorMessage name="body" component="span" className={css.error} />
+          <label htmlFor="content">Content</label>
+          <Field id="content" as="textarea" name="content" rows={8} className={css.textarea} />
+          <ErrorMessage name="content" component="span" className={css.error} />
         </div>
 
         <div className={css.actions}>
           <button type="button" className={css.cancelButton} onClick={onClose}>
             Cancel
           </button>
-          <button type="submit" className={css.submitButton} disabled={false}>
+          <button type="submit" className={css.submitButton} disabled={isSubmitting}>
             Create post
           </button>
         </div>
