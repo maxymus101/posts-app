@@ -12,13 +12,14 @@ import CreatePostForm from "../CreatePostForm/CreatePostForm";
 import { usePosts } from "../../hooks/usePosts";
 import { useCreatePost } from "../../hooks/useCreatePost";
 import { useDeletePost } from "../../hooks/useDeletePost";
+import { Post } from "../../types/post";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreatePost, setIsCreatePost] = useState(false);
   const [isEditPost, setIsEditPost] = useState(false);
-  const [editedPost, setEditedPost] = useState(false);
+  const [editedPost, setEditedPost] = useState<Post>();
   const [searchQuery, setSearchQuery] = useState("");
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -31,7 +32,10 @@ export default function App() {
 
   const deletePostMutation = useDeletePost();
 
-  const totalPages = Math.ceil((data?.length ?? 0) / 12);
+  const allPosts = 100;
+
+  const totalPages = Math.ceil(allPosts / (data?.length ?? 0));
+  console.log(`length = ${data?.length}`);
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
@@ -57,29 +61,44 @@ export default function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox query={searchQuery} onSearch={setSearchQuery} />
-        {isLoading && <Loader />}
-        {isError && (
-          <ErrorMessage message={error?.message} onClick={handleError} isRetrying={isRetrying} />
-        )}
         <Pagination
           totalPages={totalPages}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
         />
-        <button className={css.button}>Create post</button>
+        <button className={css.button} onClick={handleOpenModal}>
+          Create Post
+        </button>
       </header>
+      {isLoading && isFetching && <Loader />}
+      {isError && (
+        <ErrorMessage
+          message={`Error message is >>> ${error?.message}`}
+          onClick={handleError}
+          isRetrying={isRetrying}
+        />
+      )}
       {isModalOpen && (
         <Modal onClose={handleCloseModal}>
-          <CreatePostForm onSubmit={handlePostAdd} onClose={handleCloseModal} />
+          {
+            <CreatePostForm
+              onSubmit={handlePostAdd}
+              onClose={handleCloseModal}
+              isSubmitting={createPostMutation.isPending}
+            />
+          }
         </Modal>
       )}
-      {data && (
+      {isSuccess && data && data.length > 0 && (
         <PostList
           posts={data}
           toggleModal={() => {}}
           toggleEditPost={() => {}}
           onDelete={handlePostDelete}
         />
+      )}
+      {isSuccess && data && data.length === 0 && (
+        <ErrorMessage message={`No posts found.`} onClick={handleError} isRetrying={isRetrying} />
       )}
     </div>
   );
