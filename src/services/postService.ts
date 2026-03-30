@@ -25,10 +25,10 @@ export const fetchPosts = async (
   perPage: number = 12
 ): Promise<Post[]> => {
   try {
-    const res = await axios.get<GetPostsResponse>("/posts", {
+    const res = await axios.get<Post[]>("/posts", {
       params: { q: searchText, _page: page, _limit: perPage },
     });
-    return res.data.posts;
+    return res.data;
   } catch (error) {
     if (isAxiosError(error)) {
       console.error("Error fetching post: ", error.message);
