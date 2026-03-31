@@ -5,7 +5,7 @@ import css from "./Pagination.module.css";
 interface PaginationProps {
   totalPages: number;
   currentPage: number;
-  onPageChange: (selected: number) => void;
+  onPageChange: ({ selected }: { selected: number }) => void;
 }
 
 export default function Pagination({ totalPages, currentPage, onPageChange }: PaginationProps) {
@@ -17,8 +17,8 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
       pageCount={totalPages}
       pageRangeDisplayed={5}
       marginPagesDisplayed={1}
-      onPageChange={({ selected }) => onPageChange(selected + 1)}
-      forcePage={currentPage - 1}
+      onPageChange={onPageChange}
+      forcePage={currentPage}
       containerClassName={css.pagination}
       activeClassName={css.active}
       nextLabel="→"
@@ -26,3 +26,4 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
     />
   );
 }
+// ({ selected }) => onPageChange(selected + 1);
