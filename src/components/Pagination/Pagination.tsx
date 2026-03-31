@@ -26,4 +26,3 @@ export default function Pagination({ totalPages, currentPage, onPageChange }: Pa
     />
   );
 }
-// ({ selected }) => onPageChange(selected + 1);
