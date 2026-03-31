@@ -32,17 +32,14 @@ export default function App() {
 
   const deletePostMutation = useDeletePost();
 
-  const allPosts = 100;
-
-  const totalPages = Math.ceil(allPosts / (data?.length ?? 0));
-  console.log(`length = ${data?.length}`);
+  const totalPages = data?.totalPages ?? 0;
 
   const handleOpenModal = () => setIsModalOpen(true);
   const handleCloseModal = () => setIsModalOpen(false);
 
   const handleError = async () => {
     setIsRetrying(true);
-    await refetch;
+    await refetch();
     setIsRetrying(false);
   };
 
@@ -61,11 +58,13 @@ export default function App() {
     <div className={css.app}>
       <header className={css.toolbar}>
         <SearchBox query={searchQuery} onSearch={setSearchQuery} />
-        <Pagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          onPageChange={setCurrentPage}
-        />
+        {isSuccess && totalPages > 1 && (
+          <Pagination
+            totalPages={totalPages}
+            currentPage={currentPage - 1}
+            onPageChange={({ selected }) => setCurrentPage(selected + 1)}
+          />
+        )}
         <button className={css.button} onClick={handleOpenModal}>
           Create Post
         </button>
@@ -89,15 +88,15 @@ export default function App() {
           }
         </Modal>
       )}
-      {isSuccess && data && data.length > 0 && (
+      {isSuccess && data && data.posts.length > 0 && (
         <PostList
-          posts={data}
+          posts={data.posts}
           toggleModal={() => {}}
           toggleEditPost={() => {}}
           onDelete={handlePostDelete}
         />
       )}
-      {isSuccess && data && data.length === 0 && (
+      {isSuccess && data && data.posts.length === 0 && (
         <ErrorMessage message={`No posts found.`} onClick={handleError} isRetrying={isRetrying} />
       )}
     </div>
