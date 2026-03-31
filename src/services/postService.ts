@@ -6,6 +6,9 @@ axios.defaults.baseURL = "https://jsonplaceholder.typicode.com";
 export interface GetPostsResponse {
   posts: Post[];
   totalPages: number;
+  totalCount: number;
+  currentPage: number;
+  perPage: number;
 }
 
 export interface CreatePost {
@@ -23,12 +26,21 @@ export const fetchPosts = async (
   searchText: string = "",
   page: number = 1,
   perPage: number = 12
-): Promise<Post[]> => {
+): Promise<GetPostsResponse> => {
   try {
     const res = await axios.get<Post[]>("/posts", {
       params: { q: searchText, _page: page, _limit: perPage },
     });
-    return res.data;
+
+    const totalCount = Number(res.headers["x-total-count"]) || 0;
+    const totalPages = Math.ceil(totalCount / perPage);
+    return {
+      posts: res.data,
+      totalPages: totalPages,
+      totalCount: totalCount,
+      currentPage: page,
+      perPage: perPage,
+    };
   } catch (error) {
     if (isAxiosError(error)) {
       console.error("Error fetching post: ", error.message);
