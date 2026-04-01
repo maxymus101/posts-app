@@ -5,7 +5,7 @@ import Pagination from "../Pagination/Pagination";
 
 import css from "./App.module.css";
 import { useState } from "react";
-import { CreatePost } from "../../services/postService";
+import { CreatePost, PatchPost } from "../../services/postService";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import CreatePostForm from "../CreatePostForm/CreatePostForm";
@@ -13,13 +13,16 @@ import { usePosts } from "../../hooks/usePosts";
 import { useCreatePost } from "../../hooks/useCreatePost";
 import { useDeletePost } from "../../hooks/useDeletePost";
 import { Post } from "../../types/post";
+import { Toaster } from "react-hot-toast";
+import EditPostForm from "../EditPostForm/EditPostForm";
+import { useEditPost } from "../../hooks/useEditPost";
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isCreatePost, setIsCreatePost] = useState(false);
   const [isEditPost, setIsEditPost] = useState(false);
-  const [editedPost, setEditedPost] = useState<Post>();
+  const [editedPost, setEditedPost] = useState<Post | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [isRetrying, setIsRetrying] = useState(false);
 
@@ -32,11 +35,21 @@ export default function App() {
 
   const deletePostMutation = useDeletePost();
 
+  const patchPostMutation = useEditPost();
+
   const totalPages = data?.totalPages ?? 0;
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    setIsCreatePost(true); // ✅ Відкриваємо для створення
+    setIsEditPost(false);
+  };
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setIsCreatePost(false);
+    setIsEditPost(false);
+    setEditedPost(null); // ✅ Очищаємо editedPost;
+  };
   const handleError = async () => {
     setIsRetrying(true);
     await refetch();
@@ -52,6 +65,22 @@ export default function App() {
 
   const handlePostDelete = (postId: number) => {
     deletePostMutation.mutate(postId);
+  };
+
+  const toggleEditPost = (post: Post) => {
+    setEditedPost(post); // ✅ Зберігаємо пост
+    setIsEditPost(true);
+    setIsCreatePost(false);
+    setIsModalOpen(true); // ✅ Відкриваємо модалку
+  };
+
+  const handlePostEdit = (postData: PatchPost | null) => {
+    if (!postData) {
+      return null;
+    }
+
+    patchPostMutation.mutate(postData);
+    handleCloseModal();
   };
 
   return (
@@ -70,6 +99,7 @@ export default function App() {
         </button>
       </header>
       {isLoading && isFetching && <Loader />}
+      <Toaster />
       {isError && (
         <ErrorMessage
           message={`Error message is >>> ${error?.message}`}
@@ -79,20 +109,31 @@ export default function App() {
       )}
       {isModalOpen && (
         <Modal onClose={handleCloseModal}>
-          {
+          {isCreatePost && (
             <CreatePostForm
               onSubmit={handlePostAdd}
               onClose={handleCloseModal}
               isSubmitting={createPostMutation.isPending}
             />
-          }
+          )}
+          {isEditPost && editedPost && (
+            <EditPostForm
+              onClose={handleCloseModal}
+              onSubmit={handlePostEdit}
+              initialValues={{
+                id: editedPost.id,
+                title: editedPost.title,
+                body: editedPost.body,
+              }}
+            />
+          )}
         </Modal>
       )}
       {isSuccess && data && data.posts.length > 0 && (
         <PostList
           posts={data.posts}
-          toggleModal={() => {}}
-          toggleEditPost={() => {}}
+          toggleModal={handleOpenModal}
+          toggleEditPost={toggleEditPost}
           onDelete={handlePostDelete}
         />
       )}
