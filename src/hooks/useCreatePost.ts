@@ -14,7 +14,7 @@ export const useCreatePost = () => {
       toast.success("Post added succesfully!");
     },
     onError: (error) => {
-      toast.error(`Failed to add note. Message >>> ${error.message}`);
+      toast.error(`Failed to add post. Message >>> ${error.message}`);
     },
   });
 };
